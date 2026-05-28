@@ -1,7 +1,9 @@
 package com.msa4hipgram.domain.auth.controllers;
 
 import com.msa4hipgram.domain.auth.requests.LoginReq;
+import com.msa4hipgram.domain.auth.responses.AuthRes;
 import com.msa4hipgram.domain.auth.services.AuthService;
+import com.msa4hipgram.global.responses.GlobalRes;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +20,16 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(
+    public ResponseEntity<GlobalRes<AuthRes>> login(
         @Valid @RequestBody LoginReq loginReq
         , HttpServletResponse response // 쿠키 저장할 때 사용할 객체
     ) {
-        authService.login(loginReq);
-
-        return ResponseEntity.status(200).body("test");
+        return ResponseEntity.status(200).body(
+            GlobalRes.<AuthRes>builder()
+                .code("00")
+                .message("로그인 완료")
+                .data(authService.login(response, loginReq))
+                .build()
+        );
     }
 }

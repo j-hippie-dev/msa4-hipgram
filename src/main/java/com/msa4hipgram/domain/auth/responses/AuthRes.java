@@ -1,11 +1,11 @@
 package com.msa4hipgram.domain.auth.responses;
 
-import com.msa4hipgram.domain.user.entities.User;
+import com.msa4hipgram.domain.user.responses.UserRes;
 import lombok.Builder;
 
 @Builder
 public record AuthRes(
-        User user
+        UserRes user
         , String accessToken
 ) {
 
