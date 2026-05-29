@@ -6,13 +6,17 @@ import com.msa4hipgram.domain.auth.responses.AuthRes;
 import com.msa4hipgram.domain.user.entities.User;
 import com.msa4hipgram.domain.user.mapper.UserMapper;
 import com.msa4hipgram.domain.user.responses.UserRes;
+import com.msa4hipgram.global.errors.custom.InvalidTokenException;
 import com.msa4hipgram.global.errors.custom.NotRegisteredException;
 import com.msa4hipgram.global.security.cookie.CookieManager;
 import com.msa4hipgram.global.security.jwt.JwtConfig;
 import com.msa4hipgram.global.security.jwt.JwtProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,43 @@ public class AuthService {
 
         // 비밀번호 체크
 
+        return this.generateAuthentication(response, user);
+    }
+
+    public AuthRes reissue(HttpServletRequest request, HttpServletResponse response) {
+        // 리프레시 토큰 획득
+        // Optional: null이 올 수 있는 값을 감싸는 Wrapper 클래스
+        Optional<String> refreshTokenOptional = jwtProvider.extractRefreshToken(request);
+        if(refreshTokenOptional.isEmpty()) {
+            throw new InvalidTokenException("토큰이 없습니다.");
+        }
+        String extractRefreshToken = refreshTokenOptional.get();
+
+        long id = Long.parseLong(jwtProvider.extractClaims(extractRefreshToken).getSubject());
+
+        // 유저 정보 획득
+        User user = userMapper.findByPk(id);
+
+        // 유저 가입 여부 확인
+        if(user == null) {
+            throw new InvalidTokenException("유효하지 않은 회원의 토큰입니다.");
+        }
+
+        // 리프레쉬 토큰 비교
+        if(!user.getRefreshToken().equals(extractRefreshToken)) {
+            throw new InvalidTokenException("토큰이 일치하지 않습니다.");
+        }
+
+        return this.generateAuthentication(response, user);
+    }
+
+    /**
+     * 엑세스 토큰 및 리프레쉬 토큰 생성 후, 리프레쉬 토큰 DB & Cookie에 저장, AuthRes로 반환
+     * @param response
+     * @param user 유저 Entity
+     * @return AuthRes
+     */
+    private AuthRes generateAuthentication(HttpServletResponse response, User user) {
         // 토큰 생성
         String newAccessToken = jwtProvider.generateAccessToken(user);
         String newRefreshToken = jwtProvider.generateRefreshToken(user);
@@ -43,11 +84,11 @@ public class AuthService {
 
         // 리프레쉬 토큰 Cookie에 저장
         cookieManager.setCookie(
-                response
-                , jwtConfig.refreshTokenCookieName()
-                , newRefreshToken
-                , jwtConfig.refreshTokenCookieExpiry()
-                , jwtConfig.reissUri()
+            response
+            , jwtConfig.refreshTokenCookieName()
+            , newRefreshToken
+            , jwtConfig.refreshTokenCookieExpiry()
+            , jwtConfig.reissUri()
         );
 
         // 리턴

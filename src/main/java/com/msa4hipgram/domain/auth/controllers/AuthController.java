@@ -4,6 +4,7 @@ import com.msa4hipgram.domain.auth.requests.LoginReq;
 import com.msa4hipgram.domain.auth.responses.AuthRes;
 import com.msa4hipgram.domain.auth.services.AuthService;
 import com.msa4hipgram.global.responses.GlobalRes;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,20 @@ public class AuthController {
                 .code("00")
                 .message("로그인 완료")
                 .data(authService.login(response, loginReq))
+                .build()
+        );
+    }
+
+    @PostMapping("/reissue-token")
+    public ResponseEntity<GlobalRes<AuthRes>> reissue(
+            HttpServletRequest request
+            , HttpServletResponse response
+    ) {
+        return ResponseEntity.status(200).body(
+            GlobalRes.<AuthRes>builder()
+                .code("00")
+                .message("토큰 재발급 완료")
+                .data(authService.reissue(request, response))
                 .build()
         );
     }
