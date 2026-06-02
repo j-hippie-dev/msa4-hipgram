@@ -9,4 +9,5 @@ import java.util.List;
 public interface PostMapper {
     List<Post> getPagination(int limit, int offset);
     Long getTotal();
+    Post findByPk(long id);
 }

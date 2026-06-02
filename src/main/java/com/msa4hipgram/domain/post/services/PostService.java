@@ -4,6 +4,7 @@ import com.msa4hipgram.domain.post.entities.Post;
 import com.msa4hipgram.domain.post.mapper.PostMapper;
 import com.msa4hipgram.domain.post.requests.PostIndexReq;
 import com.msa4hipgram.domain.post.responses.PostIndexRes;
+import com.msa4hipgram.global.errors.custom.DeletedRecordException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,9 +27,19 @@ public class PostService {
 
         // 컨트롤러 전달
         return PostIndexRes.builder()
-                .total(total)
-                .lastPage(lastPage)
-                .posts(posts)
-                .build();
+            .total(total)
+            .lastPage(lastPage)
+            .posts(posts)
+            .build();
+    }
+
+    public Post show(long id) {
+        Post post = postMapper.findByPk(id);
+
+        if(post == null) {
+            throw new DeletedRecordException("이미 삭제된 게시글입니다.");
+        }
+
+        return post;
     }
 }
