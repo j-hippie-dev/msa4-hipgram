@@ -1,6 +1,7 @@
 package com.msa4hipgram.domain.auth.controllers;
 
 import com.msa4hipgram.domain.auth.requests.LoginReq;
+import com.msa4hipgram.domain.auth.requests.RegistrationReq;
 import com.msa4hipgram.domain.auth.responses.AuthRes;
 import com.msa4hipgram.domain.auth.services.AuthService;
 import com.msa4hipgram.global.responses.GlobalRes;
@@ -61,6 +62,20 @@ public class AuthController {
             GlobalRes.<String>builder()
                 .code("00")
                 .message("로그아웃 완료")
+                .build()
+        );
+    }
+
+    @PostMapping("/registration")
+    public ResponseEntity<GlobalRes<String>> registration(
+        @Valid @RequestBody RegistrationReq registrationReq
+        ) {
+        authService.registration(registrationReq);
+
+        return ResponseEntity.status(200).body(
+            GlobalRes.<String>builder()
+                .code("00")
+                .message("회원가입 완료")
                 .build()
         );
     }
