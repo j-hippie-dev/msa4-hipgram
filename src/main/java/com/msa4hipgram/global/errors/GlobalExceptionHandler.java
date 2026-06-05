@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -77,11 +78,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicatedRecordException.class)
     public ResponseEntity<GlobalRes<String>> duplicatedRecordHandle(DuplicatedRecordException e) {
         return ResponseEntity.status(409).body(
-                GlobalRes.<String>builder()
-                        .code("E11")
-                        .message("DUPLICATED_RECORD_ERROR")
-                        .data(e.getMessage())
-                        .build()
+            GlobalRes.<String>builder()
+                .code("E11")
+                .message("DUPLICATED_RECORD_ERROR")
+                .data(e.getMessage())
+                .build()
         );
     }
 
@@ -99,20 +100,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<GlobalRes<Map<String, String>>> methodArgumentNotValidHandle(MethodArgumentNotValidException e) {
         Map<String, String> errors = e.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .collect(Collectors.toMap(
-                        FieldError::getField, // 필드명
-                        fieldError -> fieldError.getDefaultMessage() != null ? fieldError.getDefaultMessage() : "유효하지 않은 값입니다.",
-                        (existing, replacement) -> existing // 중복 필드가 있을 경우 기존 값 유지
-                ));
+            .getFieldErrors()
+            .stream()
+            .collect(Collectors.toMap(
+                FieldError::getField, // 필드명
+                fieldError -> fieldError.getDefaultMessage() != null ? fieldError.getDefaultMessage() : "유효하지 않은 값입니다.",
+                (existing, replacement) -> existing // 중복 필드가 있을 경우 기존 값 유지
+            ));
 
         return ResponseEntity.status(400).body(
-                GlobalRes.<Map<String, String>>builder()
-                        .code("E21")
-                        .message("요청 파라미터에 이상이 있습니다.")
-                        .data(errors)
-                        .build()
+            GlobalRes.<Map<String, String>>builder()
+                .code("E21")
+                .message("요청 파라미터에 이상이 있습니다.")
+                .data(errors)
+                .build()
         );
     }
 
@@ -129,6 +130,18 @@ public class GlobalExceptionHandler {
                 .code("E40")
                 .message("파일 업로드 실패")
                 .data(e.getMessage())
+                .build()
+        );
+    }
+
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<GlobalRes<String>> sqlHandle(SQLException e) {
+        log.error("DB 에러", e);
+        return ResponseEntity.status(500).body(
+            GlobalRes.<String>builder()
+                .code("E80")
+                .message("DB 에러")
+                .data("현재 서비스 이용이 불가합니다. 잠시 후 다시 시도해 주십시오.")
                 .build()
         );
     }
