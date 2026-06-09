@@ -3,6 +3,7 @@ package com.msa4hipgram.domain.post.services;
 import com.msa4hipgram.domain.post.entities.Post;
 import com.msa4hipgram.domain.post.mapper.PostMapper;
 import com.msa4hipgram.domain.post.requests.PostIndexReq;
+import com.msa4hipgram.domain.post.requests.PostStoreReq;
 import com.msa4hipgram.domain.post.responses.PostIndexRes;
 import com.msa4hipgram.global.errors.custom.DeletedRecordException;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +42,15 @@ public class PostService {
         }
 
         return post;
+    }
+
+    public void store(long loginUserId, PostStoreReq postStoreReq) {
+        Post post = Post.builder()
+                .userId(loginUserId)
+                .content(postStoreReq.content())
+                .image(postStoreReq.image())
+                .build();
+
+        postMapper.insert(post);
     }
 }

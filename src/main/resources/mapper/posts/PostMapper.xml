@@ -50,4 +50,22 @@
                 deleted_at IS NULL
             AND user_id = #{userId}
     </select>
+    
+    <insert id="insert" parameterType="com.msa4hipgram.domain.post.entities.Post">
+        INSERT INTO posts(
+            id
+            , user_id
+            , content
+            , image
+            , created_at
+            , updated_at
+        ) VALUES (
+            #{id}
+            , #{userId}
+            , #{content}
+            , #{image}
+            , NOW()
+            , NOW()
+        )
+    </insert>
 </mapper>

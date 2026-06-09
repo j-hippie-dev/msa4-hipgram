@@ -2,16 +2,17 @@ package com.msa4hipgram.domain.post.controllers;
 
 import com.msa4hipgram.domain.post.entities.Post;
 import com.msa4hipgram.domain.post.requests.PostIndexReq;
+import com.msa4hipgram.domain.post.requests.PostStoreReq;
 import com.msa4hipgram.domain.post.responses.PostIndexRes;
 import com.msa4hipgram.domain.post.services.PostService;
 import com.msa4hipgram.global.responses.GlobalRes;
+import io.jsonwebtoken.Claims;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -44,6 +45,22 @@ public class PostController {
                 .message("게시글 상세 정상 처리")
                 .data(result)
                 .build()
+        );
+    }
+
+    @PostMapping("/posts")
+    public ResponseEntity<GlobalRes<Post>> store(
+            @Valid @RequestBody PostStoreReq postStoreReq,
+            @AuthenticationPrincipal Claims claims
+    ) {
+        long loginUserId = Long.parseLong(claims.getSubject());
+        postService.store(loginUserId, postStoreReq);
+
+        return ResponseEntity.status(200).body(
+                GlobalRes.<Post>builder()
+                        .code("00")
+                        .message("게시글이 정상적으로 등록되었습니다.")
+                        .build()
         );
     }
 }
