@@ -4,7 +4,7 @@ CREATE TABLE `users`(
 	, `password`		VARCHAR(255) NOT NULL
 	, `nick`			VARCHAR(20)	 NOT NULL
 	, `provider`		VARCHAR(10)	 NOT NULL DEFAULT 'NONE'
-	, `role`			VARCHAR(20)	 NOT NULL DEFAULT 'NOMAL'
+	, `role`			VARCHAR(10)	 NOT NULL DEFAULT 'NORMAL'
 	, `profile`		    VARCHAR(100) NOT NULL
 	, `refresh_token`	VARCHAR(255) DEFAULT NULL
 	, `created_at`		DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP()
