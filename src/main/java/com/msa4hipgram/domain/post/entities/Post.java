@@ -10,6 +10,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
+
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "posts")
@@ -41,12 +43,12 @@ public class Post {
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)
-    private String createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
-    private String updatedAt;
+    private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at", nullable = true)
-    private String deletedAt;
+    private LocalDateTime deletedAt;
 }

@@ -1,6 +1,6 @@
 package com.msa4hipgram.domain.post.responses;
 
-import com.msa4hipgram.domain.post.entities.PostMybatis;
+import com.msa4hipgram.domain.post.entities.Post;
 import lombok.Builder;
 
 import java.util.List;
@@ -9,6 +9,6 @@ import java.util.List;
 public record PostIndexRes(
         Long total
         , boolean lastPage
-        , List<PostMybatis> posts
+        , List<Post> posts
 ) {
 }

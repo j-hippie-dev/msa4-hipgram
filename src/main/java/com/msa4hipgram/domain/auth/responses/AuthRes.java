@@ -1,12 +1,16 @@
 package com.msa4hipgram.domain.auth.responses;
 
-import com.msa4hipgram.domain.user.responses.UserRes;
-import lombok.Builder;
+import com.msa4hipgram.domain.user.entities.User;
+import com.msa4hipgram.domain.user.responses.UserWithPostCountRes;
 
-@Builder
 public record AuthRes(
-        UserRes user
+        UserWithPostCountRes user
         , String accessToken
 ) {
-
+    public static AuthRes from(User user, String accessToken, long countPosts) {
+        return new AuthRes(
+            UserWithPostCountRes.from(user, countPosts)
+            ,accessToken
+        );
+    }
 }
